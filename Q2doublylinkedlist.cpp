@@ -1,102 +1,109 @@
 
 // Tanay
-// csc/24/52
-// practical 2
-// to implement doubly linked list as an ADT
-
+// CSC/24/52
+// Practical 2
+// Implement Doubly Linked List as an ADT
 
 #include <iostream>
-#include<math.h>
 using namespace std;
 
 class Node {
-    public:
+public:
     int data;
+    Node* prev;
     Node* next;
 
-    Node(int data) {
-        this->data = data;
-        this->next = NULL;
+    Node(int val) {
+        data = val;
+        prev = next = NULL;
     }
 };
 
-void printList(Node* tail) {
-    if(tail == NULL) {
-        cout << "List is Empty!" << endl;
-        return;
+class DoublyLinkedList {
+    Node* head;
+public:
+    DoublyLinkedList() { head = NULL; }
+
+    // Insert at beginning
+    void insertAtBeginning(int x) {
+        Node* newNode = new Node(x);
+        if (head != NULL)
+            head->prev = newNode;
+        newNode->next = head;
+        head = newNode;
     }
 
-    Node* temp = tail;
-    cout << "Circular List : ";
-
-    do {
-        cout << temp->data << " ";
-        temp = temp->next;
-    } while(temp != tail);
-    
-    cout << endl;
-}
-
-void insertion(Node* &tail, int data, int target) {
-    Node *insertNode = new Node(data);
-
-    if(tail == NULL) {
-        tail = insertNode;
-        insertNode->next = tail;
-        return;
-    }
-
-    Node* curr = tail;
-
-    while(curr->data != target) {
-        curr = curr->next;
-    }
-
-    insertNode->next = curr->next;
-    curr->next = insertNode;
-}
-
-void deletion(Node* &tail, int val) {
-    if(tail == NULL) {
-        cout << "List is Empty!" << endl;
-        return;
-    }
-
-    Node *prev = tail;
-    Node *curr = tail->next;
-
-    while(curr->data != val) {
-        prev = curr;
-        curr = curr->next;
-
-        if(curr == tail && curr->data != val) {
-            cout << "Element Not Found!" << endl;
+    // Insert at end
+    void insertAtEnd(int x) {
+        Node* newNode = new Node(x);
+        if (head == NULL) {
+            head = newNode;
             return;
         }
+        Node* temp = head;
+        while (temp->next != NULL)
+            temp = temp->next;
+        temp->next = newNode;
+        newNode->prev = temp;
     }
 
-    prev->next = curr->next;
-    curr->next = NULL;
-
-    if(curr == tail) {
-        tail = prev;
+    // Remove from beginning
+    void removeFromBeginning() {
+        if (head == NULL) {
+            cout << "List is empty!\n";
+            return;
+        }
+        Node* temp = head;
+        head = head->next;
+        if (head != NULL)
+            head->prev = NULL;
+        delete temp;
     }
 
-    delete curr;
-}
+    // Remove from end
+    void removeFromEnd() {
+        if (head == NULL) {
+            cout << "List is empty!\n";
+            return;
+        }
+        if (head->next == NULL) {
+            delete head;
+            head = NULL;
+            return;
+        }
+        Node* temp = head;
+        while (temp->next != NULL)
+            temp = temp->next;
+        temp->prev->next = NULL;
+        delete temp;
+    }
+
+    // Display list
+    void display() {
+        Node* temp = head;
+        cout << "Doubly Linked List: ";
+        while (temp != NULL) {
+            cout << temp->data << " <-> ";
+            temp = temp->next;
+        }
+        cout << "NULL\n";
+    }
+};
 
 int main() {
-    Node *tail = NULL;
+    DoublyLinkedList dll;
+    dll.insertAtBeginning(10);
+    dll.insertAtBeginning(5);
+    dll.insertAtEnd(20);
+    dll.insertAtEnd(25);
 
-    insertion(tail, pow(2,4), 2);
-    insertion(tail, pow(2,3), 16);
-    insertion(tail, pow(2,5), 8);
-    insertion(tail, pow(2,2), 16);
+    dll.display();
 
-    printList(tail);
+    dll.removeFromBeginning();
+    dll.display();
 
-    deletion(tail, 64);
-    printList(tail);
+    dll.removeFromEnd();
+    dll.display();
 
     return 0;
 }
