@@ -3,139 +3,118 @@
 // practical 1
 // to implement singly linked list as an ADT
 
-#include <bits/stdc++.h>
+#include <iostream>
 using namespace std;
 
 class Node {
-    public:
+public:
     int data;
     Node* next;
-
-    Node(int data) {
-        this->data = data;
-        this->next = NULL;
+    Node(int val) {
+        data = val;
+        next = NULL;
     }
 };
 
-void printList(Node* head) {
-    if(head == NULL) {
-        cout << "List is Empty!" << endl;
-        return;
-    }
-    
-    cout << "Singly List : ";
-    while(head != NULL) {
-        cout << head->data << " ";
-        head = head->next;
-    }
-    cout << endl;
-}
+class SinglyLinkedList {
+    Node* head;
+public:
+    SinglyLinkedList() { head = NULL; }
 
-void insertAtHead(Node* &head, int data) {
-    Node *temp = new Node(data);
-    temp->next = head;
-    head = temp;
-}
-
-void insertAtTail(Node* &tail, int data) {
-    Node *temp = new Node(data);
-    tail->next = temp;
-    tail = temp;
-}
-
-void insertAtMiddle(Node* &head, Node* &tail, int data, int pos) {
-    if(pos == 1) {
-        insertAtHead(head, data);
-        return;
+    // Insert at beginning
+    void insertAtBeginning(int x) {
+        Node* newNode = new Node(x);
+        newNode->next = head;
+        head = newNode;
     }
 
-    Node *temp = head;
-    while(temp != NULL && pos>2) {
-        temp = temp->next;
-        pos--;
+    // Insert at i-th position (1-based)
+    void insertAtPosition(int pos, int x) {
+        if (pos == 1) {
+            insertAtBeginning(x);
+            return;
+        }
+        Node* newNode = new Node(x);
+        Node* temp = head;
+        for (int i = 1; temp != NULL && i < pos - 1; i++)
+            temp = temp->next;
+        if (temp == NULL) {
+            cout << "Position out of range!\n";
+            delete newNode;
+            return;
+        }
+        newNode->next = temp->next;
+        temp->next = newNode;
     }
 
-    if(temp==NULL || pos<=0) {
-        cout << "Invalid Position!" << endl;
-        return;
-    }
-
-    Node *insertNode = new Node(data);
-    insertNode->next = temp->next;
-    temp->next = insertNode;
-
-    if(insertNode->next == NULL) {
-        tail = insertNode;
-    }
-}
-
-void deletePosition(Node* &head, int pos) {
-    Node *temp = head;
-    if(pos == 1) {
+    // Remove from beginning
+    void removeFromBeginning() {
+        if (head == NULL) {
+            cout << "List empty!\n";
+            return;
+        }
+        Node* temp = head;
         head = head->next;
         delete temp;
-        return;
     }
 
-    while(temp!=NULL && pos>2) {
-        temp = temp->next;
-        pos--;
-    }
-
-    if(temp==NULL || temp->next==NULL || pos<=0) {
-        cout << "Invalid Position!" << endl;
-        return;
-    }
-
-    Node* target = temp->next;
-    temp->next = target->next;
-    delete target;
-}
-
-void deleteValue(Node* &head, int val) {
-    Node* temp = head->next;
-    Node* prev = head;
-    
-    if(head->data == val) {
-        head = head->next;
-        delete prev;
-        return;
-    }
-
-    while(temp!=NULL) {
-        if(temp->data == val) {
-            val = INT_MIN;
-            break;
+    // Remove from i-th position
+    void removeFromPosition(int pos) {
+        if (head == NULL) {
+            cout << "List empty!\n";
+            return;
         }
-
-        prev = temp;
-        temp = temp->next;
+        if (pos == 1) {
+            removeFromBeginning();
+            return;
+        }
+        Node* temp = head;
+        for (int i = 1; temp != NULL && i < pos - 1; i++)
+            temp = temp->next;
+        if (temp == NULL || temp->next == NULL) {
+            cout << "Position out of range!\n";
+            return;
+        }
+        Node* del = temp->next;
+        temp->next = del->next;
+        delete del;
     }
 
-    if(prev->next==NULL || val!=INT_MIN) {
-        cout << "Value Not Found!" << endl;
-        return;
+    // Search element
+    Node* search(int x) {
+        Node* temp = head;
+        while (temp != NULL) {
+            if (temp->data == x)
+                return temp;
+            temp = temp->next;
+        }
+        return NULL;
     }
-    
-    prev->next = temp->next;
-    delete temp;
-}
+
+    // Display
+    void display() {
+        Node* temp = head;
+        while (temp != NULL) {
+            cout << temp->data << " -> ";
+            temp = temp->next;
+        }
+        cout << "NULL\n";
+    }
+};
 
 int main() {
-    Node *head = new Node(1);
-    Node *tail = head;
+    SinglyLinkedList list;
+    list.insertAtBeginning(10);
+    list.insertAtBeginning(5);
+    list.insertAtPosition(2, 7);
+    list.display();
 
-    for(int i=1; i<=5; i++) {
-        insertAtTail(tail, pow(2,i));
-    }
+    list.removeFromPosition(2);
+    list.display();
 
-    printList(head);
-
-    // deletePosition(head, 6);
-    // printList(head);
-
-    deleteValue(head, 32);
-    printList(head);
+    Node* found = list.search(10);
+    if (found) cout << "Element found: " << found->data << endl;
+    else cout << "Element not found\n";
 
     return 0;
 }
